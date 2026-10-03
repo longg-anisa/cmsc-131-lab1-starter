@@ -36,6 +36,9 @@
   section .note.GNU-stack noalloc noexec nowrite progbits
 %endif
 
+segment .bss
+stash   resd 1
+
 segment .text
         global  _ip_checksum
 _ip_checksum:
@@ -61,8 +64,45 @@ _ip_checksum:
         ; that consumes two bytes per iteration and stops on ecx == 0 is
         ; enough. Leave the answer in ax when you return.
         ;
+        ; esi = header, ecx = length in bytes, returns checksum in ax
 
+
+        mov     esi, [ebp+8]            ;save header pointer
+        mov     ecx, [ebp+12]           ;get ecx from ebp offset
+        
+
+; the loop changes ebx and esi, so save both before it and restore them after
+        xor     eax, eax                 ; accumulator
+sum_loop:
+        cmp     ecx, 0
+        jle     fold
+        movzx   ebx, byte [esi]
+        shl     ebx, 8
+        movzx   edx, byte [esi + 1]
+        or      ebx, edx
+        add     eax, ebx                 ; 32-bit accumulator, carries are kept
+        add     esi, 2
+        sub     ecx, 2
+        jmp     sum_loop
+fold:
+        ;pseudocode: while (eax >> 16) != 0: eax = (eax & 0xFFFF) + (eax >> 16)
+        mov     ebx, eax                ;save eax
+        shr     eax, 16                 ;get high bits
+        cmp     eax, 0
+        mov     eax, ebx                ;get original eax val BEFORE CHECK
+        jz      done_fold
+
+
+        shr     eax, 16                 ;eax:high bits
+        and     ebx, 0xFFFF             ;ebx:low bits
+        add     eax, ebx
+        jmp     fold
+
+done_fold:
+        not     eax
+        and     eax, 0xFFFF
+        mov     [stash], eax            ;save eax=folded before popa
         popa
-        mov     eax, 0
+        mov     eax, [stash]
         leave
         ret

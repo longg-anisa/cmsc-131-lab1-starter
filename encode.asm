@@ -66,6 +66,124 @@ _encode_header:
         ; edx do not.
         ;
 
+        ; encoding header
+        mov     esi, [ebp+8]            ; in, ipv4_fields
+        mov     edi, [ebp+12]           ; hdr
+
+
+        ; byte 0: version and ihl
+        mov     eax, [esi+0]            ; get version
+        shl     eax, 4                  ; shift version into upper 4 bits
+        
+        mov     ebx, [esi+4]            ; get ihl
+        and     ebx, 0x0F               ; keep only lower 4 bits                   
+
+        or      eax, ebx                ; combine version and ihl
+        mov     [edi+0], al             ; store byte 0
+
+
+        ; byte 1: dscp and ecn
+        mov     eax, [esi+8]            ; get dscp
+        shl     eax, 2                  ; shift dscp into upper 6 bits
+        
+        mov     ebx, [esi+12]           ; get ecn
+        and     ebx, 0x03               ; keep only lower 2 bits                   
+
+        or      eax, ebx                ; combine dscp and ecn
+        mov     [edi+1], al             ; store byte 1
+
+
+        ; bytes 2-3: total length, one 16-bits
+        mov     eax, [esi+16]           ; get total length
+        and     eax, 0xFF00             ; mask to get high byte
+        
+        mov     [edi+2], ah             ; store byte 2
+
+        mov     ebx, [esi+16]           ; get total length again
+        and     ebx, 0x00FF             ; mask to get lower byte                   
+
+        mov     [edi+3], bl             ; store byte 3
+
+
+        ; bytes 4-5: identification, one 16-bits
+        mov     eax, [esi+20]           ; get identification
+        and     eax, 0xFF00             ; mask to get high byte
+        
+        mov     [edi+4], ah             ; store byte 4
+
+        mov     ebx, [esi+20]           ; get identification again
+        and     ebx, 0x00FF             ; mask to get lower byte                   
+
+        mov     [edi+5], bl             ; store byte 5
+
+
+        ; byte 6-7: flags and fragment offset
+        mov     eax, [esi+24]           ; get flags (3 bits)
+        shl     eax, 13                 ; shift into upper 3 bits
+        
+        mov     ebx, [esi+28]           ; get fragment offset (13 bits)
+        and     ebx, 0x1FFF             ; keep only 13 bits
+
+        or      eax, ebx                ; combine flags and fragment
+        
+        and     eax, 0xFF00             ; mask to get high byte                   
+        mov     [edi+6], ah             ; store byte 6
+
+        and     ebx, 0x00FF             ; mask to get lower byte
+        mov     [edi+7], bl             ; store byte 7
+
+
+        ; byte 8: ttl
+        mov     eax, [esi+32]           ; get ttl
+        mov     [edi+8], al             ; store byte 8
+
+
+        ; byte 9: protocol
+        mov     eax, [esi+36]           ; get protocol
+        mov     [edi+9], al             ; store byte 9 
+
+
+        ; bytes 10-11: header checksum
+        mov     word [edi+10], 0        ; checksum must be zero while calculating
+
+        ; finished bytes 12-19 first before storing bytes 10-11
+
+        ; bytes 12-15: source address
+        mov     eax, [esi+44]           ; get first byte
+        mov     [edi+12], al            ; store byte 12  
+
+        mov     eax, [esi+45]           ; get second byte
+        mov     [edi+13], al            ; store byte 13  
+
+        mov     eax, [esi+46]           ; get third byte
+        mov     [edi+14], al            ; store byte 14  
+
+        mov     eax, [esi+47]           ; get fourth byte
+        mov     [edi+15], al            ; store byte 15  
+
+
+        ; bytes 16-19: destination address
+        mov     eax, [esi+48]           ; get first byte
+        mov     [edi+16], al            ; store byte 16  
+
+        mov     eax, [esi+49]           ; get second byte
+        mov     [edi+17], al            ; store byte 17  
+
+        mov     eax, [esi+50]           ; get third byte
+        mov     [edi+18], al            ; store byte 18  
+
+        mov     eax, [esi+51]           ; get fourth byte
+        mov     [edi+19], al            ; store byte 19
+
+
+        push    20                      ; header length
+        push    edi                     ; header address
+        call    _ip_checksum            ; calculate checksum
+        add     esp, 8                  ; remove arguments from stack
+
+        mov     [edi+10], ah            ; store byte 10 (checksum high byte)
+        mov     [edi+11], al            ; store byte 11 (checksum low byte)
+
         popa
         mov     eax, 0
         leave

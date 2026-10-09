@@ -13,4 +13,10 @@ sample02 valid
 sample03 valid
 sample04 valid
 sample05 valid
+frag0 valid
+frag1 valid
+frag8191 valid
+flags_df valid
+flags_mf valid
+flags_both valid
 bad01 invalid

@@ -1,7 +1,8 @@
 <!--no-pdf-->
 # CMSC 131 Lab 1 Starter
 
-[![lab1-checks](https://github.com/WhiteLicorice/cmsc-131-lab1-starter/actions/workflows/test.yml/badge.svg)](https://github.com/WhiteLicorice/cmsc-131-lab1-starter/actions/workflows/test.yml)
+[![lab1-checks](https://github.com/longg-anisa/cmsc-131-lab1-starter/actions/workflows/test.yml/badge.svg)](https://github.com/longg-anisa/cmsc-131-lab1-starter/actions/workflows/test.yml)
+<!-- [![lab1-checks](https://github.com/WhiteLicorice/cmsc-131-lab1-starter/actions/workflows/test.yml/badge.svg)](https://github.com/WhiteLicorice/cmsc-131-lab1-starter/actions/workflows/test.yml) -->
 
 Decode, encode, and checksum 20-byte IPv4 packet headers under a C driver.
 The manual is the assignment. This file is the repository's own notes.

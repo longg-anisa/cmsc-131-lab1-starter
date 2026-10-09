@@ -198,15 +198,7 @@ The routines access the `ipv4_fields` structure using the following offsets:
 
 ## Quirks and Issues
 
-Complete this section before the Week 3 progress report. The syllabus asks
-for documentation of quirks and issues with the complete implementation.
-One entry per item. State what happens, what causes it, and what the group
-did about it.
-
-### Known issues
-
-- 
-
-### Quirks
-
-- 
+- popa restores `eax` in checksum.asm, overwriting checksum result.  **[RESOLVED]**
+    - Fix: stash `eax` to a reserve doubleword, then push its value back to `eax`.
+- flag and fragment offsets do not give correct value.  **[RESOLVED]**
+    - Fix: switched `eax` and `[edi+offset]` in `mov` in lines 126 and 127, decode.asm 

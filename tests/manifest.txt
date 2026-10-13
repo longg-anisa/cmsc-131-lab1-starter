@@ -19,4 +19,10 @@ frag8191 valid
 flags_df valid
 flags_mf valid
 flags_both valid
+len20 valid
+len65535 valid
+ttl1 valid
+ttl255 valid
+dscp63 valid
+csum valid
 bad01 invalid

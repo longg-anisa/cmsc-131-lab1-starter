@@ -201,4 +201,6 @@ The routines access the `ipv4_fields` structure using the following offsets:
 - popa restores `eax` in checksum.asm, overwriting checksum result.  **[RESOLVED]**
     - Fix: stash `eax` to a reserve doubleword, then push its value back to `eax`.
 - flag and fragment offsets do not give correct value.  **[RESOLVED]**
-    - Fix: switched `eax` and `[edi+offset]` in `mov` in lines 126 and 127, decode.asm 
+    - Fix: switched `eax` and `[edi+offset]` in `mov` in lines 126 and 127, decode.asm
+- wrong value stored for byte 5, which should be identification's low byte. **[RESOLVED]**
+  - Fix: changed `al` to `bl` in `mov` in lines 117, encode.asm, as ebx was used to store the low byte.
